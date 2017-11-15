@@ -1422,14 +1422,16 @@
         this.log(inputValue, 'history');
 
         // add return if it doesn't start with it
-        if (inputValue.indexOf('return') !== 0) {
-          inputValue = 'return ' + inputValue;
-        }
+        // if (inputValue.indexOf('return') !== 0) {
+        //   inputValue = 'return ' + inputValue;
+        // }
 
         // show output or errors
         try {
           // run the console input in the iframe context
-          var scriptOutput = this.getIframe().contentWindow.eval('(function() {' + inputValue + '})()');
+        //   var scriptOutput = this.getIframe().contentWindow.eval('(function() {' + inputValue + '})()');
+        //  @TODO: very very hacky, do this modification in the plugin file and then compile
+          var scriptOutput = this.getIframe().contentWindow.eval.call(null, inputValue);
 
           this.log(scriptOutput);
         } catch (err) {
