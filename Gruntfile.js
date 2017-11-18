@@ -102,14 +102,14 @@ module.exports = function (grunt) {
     },
     rollup: {
       options: {
-        sourceMap: true,
+        moduleName: 'Jotted',
+        sourcemap: true,
         plugins: [
-          babel({
-            exclude: 'node_modules/**'
-          })
+            babel({
+              exclude: 'node_modules/**'
+            })
         ],
-        format: 'umd',
-        moduleName: 'Jotted'
+        format: 'umd'
       },
       files: {
         src: 'src/core.js',

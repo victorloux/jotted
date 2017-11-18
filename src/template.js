@@ -37,7 +37,7 @@ export function paneActiveClass (type) {
 }
 
 export function containerClass () {
-  return `jotted`
+  return 'jotted'
 }
 
 export function hasFileClass (type) {
