@@ -1069,7 +1069,7 @@
       var $pane = document.createElement('div');
       addClass($pane, 'jotted-pane jotted-pane-console');
 
-      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output"></ul>\n        <form class="jotted-console-input">\n          <input type="text">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear</button>\n    ';
+      $pane.innerHTML = '\n      <div class="jotted-console-container">\n        <ul class="jotted-console-output" aria-live="polite" aria-relevant="additions"></ul>\n        <form class="jotted-console-input">\n          <input type="text" aria-label="Console input">\n        </form>\n      </div>\n      <button class="jotted-button jotted-console-clear">Clear console</button>\n    ';
 
       jotted.$container.appendChild($pane);
       jotted.$container.querySelector('.jotted-nav').appendChild($nav);
@@ -1218,7 +1218,20 @@
           addClass($log, 'jotted-console-log-' + type);
         }
 
+        // Text alternative for screen readers
+        var $logDescriptiveText = document.createElement('span');
+        addClass($logDescriptiveText, 'sr-only');
+
+        if (typeof type === 'undefined') {
+          $logDescriptiveText.innerHTML = 'Output: ';
+        } else if (type === 'history') {
+          $logDescriptiveText.innerHTML = 'Input: ';
+        } else {
+          $logDescriptiveText.innerHTML = type + ': ';
+        }
+
         $log.innerHTML = message;
+        $log.insertBefore($logDescriptiveText, $log.firstChild);
 
         this.$output.appendChild($log);
       }

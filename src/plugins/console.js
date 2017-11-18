@@ -29,12 +29,12 @@ export default class PluginConsole {
 
     $pane.innerHTML = `
       <div class="jotted-console-container">
-        <ul class="jotted-console-output"></ul>
+        <ul class="jotted-console-output" aria-live="polite" aria-relevant="additions"></ul>
         <form class="jotted-console-input">
-          <input type="text">
+          <input type="text" aria-label="Console input">
         </form>
       </div>
-      <button class="jotted-button jotted-console-clear">Clear</button>
+      <button class="jotted-button jotted-console-clear">Clear console</button>
     `
 
     jotted.$container.appendChild($pane)
@@ -172,7 +172,20 @@ export default class PluginConsole {
       util.addClass($log, `jotted-console-log-${type}`)
     }
 
+    // Text alternative for screen readers
+    var $logDescriptiveText = document.createElement('span')
+    util.addClass($logDescriptiveText, 'sr-only')
+
+    if (typeof type === 'undefined') {
+      $logDescriptiveText.innerHTML = 'Output: '
+    } else if (type === 'history') {
+      $logDescriptiveText.innerHTML = 'Input: '
+    } else {
+      $logDescriptiveText.innerHTML = `${type}: `
+    }
+
     $log.innerHTML = message
+    $log.insertBefore($logDescriptiveText, $log.firstChild)
 
     this.$output.appendChild($log)
   }
