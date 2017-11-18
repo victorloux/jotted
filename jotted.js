@@ -253,118 +253,7 @@
 
 
 
-  var asyncGenerator = function () {
-    function AwaitValue(value) {
-      this.value = value;
-    }
 
-    function AsyncGenerator(gen) {
-      var front, back;
-
-      function send(key, arg) {
-        return new Promise(function (resolve, reject) {
-          var request = {
-            key: key,
-            arg: arg,
-            resolve: resolve,
-            reject: reject,
-            next: null
-          };
-
-          if (back) {
-            back = back.next = request;
-          } else {
-            front = back = request;
-            resume(key, arg);
-          }
-        });
-      }
-
-      function resume(key, arg) {
-        try {
-          var result = gen[key](arg);
-          var value = result.value;
-
-          if (value instanceof AwaitValue) {
-            Promise.resolve(value.value).then(function (arg) {
-              resume("next", arg);
-            }, function (arg) {
-              resume("throw", arg);
-            });
-          } else {
-            settle(result.done ? "return" : "normal", result.value);
-          }
-        } catch (err) {
-          settle("throw", err);
-        }
-      }
-
-      function settle(type, value) {
-        switch (type) {
-          case "return":
-            front.resolve({
-              value: value,
-              done: true
-            });
-            break;
-
-          case "throw":
-            front.reject(value);
-            break;
-
-          default:
-            front.resolve({
-              value: value,
-              done: false
-            });
-            break;
-        }
-
-        front = front.next;
-
-        if (front) {
-          resume(front.key, front.arg);
-        } else {
-          back = null;
-        }
-      }
-
-      this._invoke = send;
-
-      if (typeof gen.return !== "function") {
-        this.return = undefined;
-      }
-    }
-
-    if (typeof Symbol === "function" && Symbol.asyncIterator) {
-      AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-        return this;
-      };
-    }
-
-    AsyncGenerator.prototype.next = function (arg) {
-      return this._invoke("next", arg);
-    };
-
-    AsyncGenerator.prototype.throw = function (arg) {
-      return this._invoke("throw", arg);
-    };
-
-    AsyncGenerator.prototype.return = function (arg) {
-      return this._invoke("return", arg);
-    };
-
-    return {
-      wrap: function (fn) {
-        return function () {
-          return new AsyncGenerator(fn.apply(this, arguments));
-        };
-      },
-      await: function (value) {
-        return new AwaitValue(value);
-      }
-    };
-  }();
 
 
 
@@ -394,81 +283,12 @@
     };
   }();
 
-
-
-
-
-
-
-  var get = function get(object, property, receiver) {
-    if (object === null) object = Function.prototype;
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent === null) {
-        return undefined;
-      } else {
-        return get(parent, property, receiver);
-      }
-    } else if ("value" in desc) {
-      return desc.value;
-    } else {
-      var getter = desc.get;
-
-      if (getter === undefined) {
-        return undefined;
-      }
-
-      return getter.call(receiver);
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  var set = function set(object, property, value, receiver) {
-    var desc = Object.getOwnPropertyDescriptor(object, property);
-
-    if (desc === undefined) {
-      var parent = Object.getPrototypeOf(object);
-
-      if (parent !== null) {
-        set(parent, property, value, receiver);
-      }
-    } else if ("value" in desc && desc.writable) {
-      desc.value = value;
-    } else {
-      var setter = desc.set;
-
-      if (setter !== undefined) {
-        setter.call(receiver, value);
-      }
-    }
-
-    return value;
-  };
-
   /* plugin
    */
 
   var plugins = [];
 
-  function find$1(id) {
+  function find(id) {
     for (var pluginIndex in plugins) {
       var plugin = plugins[pluginIndex];
       if (plugin._id === id) {
@@ -502,7 +322,7 @@
         pluginOptions = plugin.options || {};
       }
 
-      Plugin = find$1(pluginName);
+      Plugin = find(pluginName);
       _this._get('plugins')[plugin] = new Plugin(_this, pluginOptions);
 
       addClass(_this._get('$container'), pluginClass(pluginName));
@@ -645,10 +465,9 @@
         html: '',
         css: '',
         js: ''
-      };
 
-      // catch domready events from the iframe
-      window.addEventListener('message', this.domready.bind(this));
+        // catch domready events from the iframe
+      };window.addEventListener('message', this.domready.bind(this));
 
       // render on each change
       jotted.on('change', this.change.bind(this), 100);
@@ -1241,10 +1060,9 @@
         html: '',
         css: '',
         js: ''
-      };
 
-      // new tab and pane markup
-      var $nav = document.createElement('li');
+        // new tab and pane markup
+      };var $nav = document.createElement('li');
       addClass($nav, 'jotted-nav-item jotted-nav-item-console');
       $nav.innerHTML = '<a href="#" data-jotted-type="console">JS Console</a>';
 
@@ -1366,7 +1184,7 @@
         // IE9 with devtools closed
         if (typeof window.console === 'undefined' || typeof window.console.log === 'undefined') {
           window.console = {
-            log: function log() {}
+            log: function log$$1() {}
           };
         }
 
@@ -1389,7 +1207,7 @@
       }
     }, {
       key: 'log',
-      value: function log() {
+      value: function log$$1() {
         var message = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var type = arguments[1];
 
@@ -1421,16 +1239,9 @@
         // log input value
         this.log(inputValue, 'history');
 
-        // add return if it doesn't start with it
-        // if (inputValue.indexOf('return') !== 0) {
-        //   inputValue = 'return ' + inputValue;
-        // }
-
         // show output or errors
         try {
           // run the console input in the iframe context
-        //   var scriptOutput = this.getIframe().contentWindow.eval('(function() {' + inputValue + '})()');
-        //  @TODO: very very hacky, do this modification in the plugin file and then compile
           var scriptOutput = this.getIframe().contentWindow.eval.call(null, inputValue);
 
           this.log(scriptOutput);
@@ -1792,8 +1603,8 @@
 
       var _arr = ['html', 'css', 'js'];
       for (var _i = 0; _i < _arr.length; _i++) {
-        var _type = _arr[_i];
-        this.markup(_type);
+        var type = _arr[_i];
+        this.markup(type);
       }
 
       // textarea change events.
@@ -1818,8 +1629,8 @@
       // load files
       var _arr2 = ['html', 'css', 'js'];
       for (var _i2 = 0; _i2 < _arr2.length; _i2++) {
-        var _type2 = _arr2[_i2];
-        this.load(_type2);
+        var _type = _arr2[_i2];
+        this.load(_type);
       }
 
       // show all tabs, even if empty
@@ -1827,8 +1638,8 @@
         var _arr3 = ['html', 'css', 'js'];
 
         for (var _i3 = 0; _i3 < _arr3.length; _i3++) {
-          var type = _arr3[_i3];
-          addClass($container, hasFileClass(type));
+          var _type2 = _arr3[_i3];
+          addClass($container, hasFileClass(_type2));
         }
       }
     }
@@ -2033,10 +1844,9 @@
         return function (topic) {
           var _arguments = arguments;
 
-          var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-          var _ref$type = _ref.type;
-          var type = _ref$type === undefined ? 'default' : _ref$type;
+          var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+              _ref$type = _ref.type,
+              type = _ref$type === undefined ? 'default' : _ref$type;
 
           if (cooldown[type]) {
             // if we had multiple calls before the cooldown
@@ -2078,5 +1888,3 @@
   return Jotted;
 
 })));
-
-//# sourceMappingURL=jotted.js.map
